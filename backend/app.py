@@ -1,5 +1,8 @@
-import eventlet
-eventlet.monkey_patch()
+from gevent import monkey
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
+
+monkey.patch_all()
 import cv2
 import numpy as np
 from flask import Flask, render_template
@@ -8,7 +11,7 @@ from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins='*')
+socketio = SocketIO(app, cors_allowed_origins='*', async_mode='gevent')
 
 @app.route('/')
 def index():
@@ -50,5 +53,5 @@ def gen_frames(frame):
         return frame
 
 if __name__ == "__main__":
-    import eventlet.wsgi
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
+    http_server = WSGIServer(('0.0.0.0', 5000), app, handler_class=WebSocketHandler)
+    http_server.serve_forever()

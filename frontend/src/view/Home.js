@@ -6,9 +6,8 @@ function Home() {
   const canvasRef = useRef(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [socket, setSocket] = useState()
-  
+
   useEffect(() => {
-    console.log(socket)
     if (initSocket) {
       setSocket(initSocket)
     }
