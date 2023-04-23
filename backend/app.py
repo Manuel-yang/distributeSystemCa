@@ -1,17 +1,14 @@
-import json
-
+import eventlet
+eventlet.monkey_patch()
 import cv2
 import numpy as np
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
-import eventlet
-import eventlet.wsgi
 
-eventlet.monkey_patch()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app, cors_allowed_origins='http://localhost:3000', async_mode='eventlet')
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 @app.route('/')
 def index():
@@ -32,8 +29,7 @@ def handle_video_frame(data):
     emit('result_data', resData)
     # print("Received video frame")
 
-if __name__ == '__main__':
-    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
+
 
 
 
@@ -52,5 +48,7 @@ def gen_frames(frame):
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         return frame
-        # yield (b'--frame\r\n'
-        #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+if __name__ == "__main__":
+    import eventlet.wsgi
+    eventlet.wsgi.server(eventlet.listen(('', 5000)), app)
