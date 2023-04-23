@@ -39,7 +39,7 @@ function Home() {
               canvas.toBlob(
                 (blob) => {
                   // console.log(blob);
-                  socket.emit("video_frame", blob);
+                  socket.emit("preprocessing", blob);
                 },
                 "image/jpeg"
               );

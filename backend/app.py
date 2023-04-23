@@ -1,13 +1,14 @@
+import os
+
 from gevent import monkey
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
-
 monkey.patch_all()
 import cv2
 import numpy as np
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
-
+from service.preprocessing import preprocessing
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -22,17 +23,28 @@ def test_connect():
     print('someone connected to websocket')
     emit('responseMessage', {'data': 'Connected! ayy'})
 
+
+@socketio.on('preprocessing')
+def processFace(data):
+    frame = buffer2frame(data)
+    resData = preprocessing(frame)
+    emit('result_data', resData)
+
 @socketio.on('video_frame')
 def handle_video_frame(data):
     # 处理接收到的视频帧数据
-    compressed_image_data = np.frombuffer(data, dtype=np.uint8)
-    frame = cv2.imdecode(compressed_image_data, cv2.IMREAD_COLOR)
+    frame = buffer2frame(data)
     resData = gen_frames(frame)
 
     emit('result_data', resData)
     # print("Received video frame")
 
 
+
+def buffer2frame(data):
+    compressed_image_data = np.frombuffer(data, dtype=np.uint8)
+    frame = cv2.imdecode(compressed_image_data, cv2.IMREAD_COLOR)
+    return frame
 
 
 
