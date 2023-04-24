@@ -48,7 +48,7 @@ function Home() {
                   },
                   "image/jpeg"
                 );
-              }, 300);
+              }, 300, 0.8);
             }
                         // 绑定关闭事件处理函数
             socket.on('disconnect', () => {
