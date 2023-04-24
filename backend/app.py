@@ -9,6 +9,7 @@ import numpy as np
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from service.preprocessing import preprocessing
+from service.face_recog import faceRecog
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -21,22 +22,24 @@ def index():
 @socketio.on('connect')
 def test_connect():
     print('someone connected to websocket')
-    emit('responseMessage', {'data': 'Connected! ayy'})
 
 
 @socketio.on('preprocessing')
 def processFace(data):
-    frame = buffer2frame(data)
-    resData = preprocessing(frame)
+    name = data["name"]
+    pic = data["blob"]
+    frame = buffer2frame(pic)
+    resData = preprocessing(frame, name)
     emit('result_data', resData)
 
 @socketio.on('video_frame')
 def handle_video_frame(data):
     # 处理接收到的视频帧数据
     frame = buffer2frame(data)
-    resData = gen_frames(frame)
-
-    emit('result_data', resData)
+    resData = faceRecog(frame)
+    # ret, buffer = cv2.imencode('.jpg', frame)
+    # frame = buffer.tobytes()
+    emit('resDetect', resData)
     # print("Received video frame")
 
 

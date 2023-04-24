@@ -10,25 +10,27 @@ def fileNumber(path):
     count = len(os.listdir(path))
     return  count
 
-def preprocessing(frame):
+def preprocessing(frame, name):
 
     size = 2
     classifier = 'Haarcascades/haarcascade_frontalface_default.xml'
     image_dir = 'service/images'
     try:
-        name_class = "YanAemons"  # name of person for recognition
+        name_class = name  # name of person for recognition
     except:
         print("You must provide a name")
         sys.exit(0)
     path = os.path.join(current_dir, image_dir, name_class)
 
-    imageNumber = fileNumber(path)+1
-    print(path)
-    if imageNumber >= 40:
-        return
-
     if not os.path.isdir(path):
         os.mkdir(path)
+
+    imageNumber = fileNumber(path)+1
+    print(path)
+    if imageNumber >= 5:
+        return
+
+
     (im_width, im_height) = (112, 92)
     haar_cascade = cv2.CascadeClassifier(classifier)
 
